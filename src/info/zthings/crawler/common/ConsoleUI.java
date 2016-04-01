@@ -4,45 +4,52 @@ import info.zthings.crawler.commands.Command;
 import info.zthings.crawler.commands.CommandHandler;
 import info.zthings.crawler.commands.ParameterException;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.Scanner;
 
 public class ConsoleUI {
 	private static Scanner sc = new Scanner(System.in);
+	private static PrintStream f;
 	
 	public static void main(String[] args) {
-		Log.out("CRAWLER v" + Ref.VER);
-		Log.out(Ref.SEP.substring(0, 9+Ref.VER.length()));
+		ConsoleUI.out("CRAWLER v" + Ref.VER);
+		ConsoleUI.out(Ref.SEP.substring(0, 9+Ref.VER.length()));
 		
-		Log.out("Initializing...");
-		Log.init("log.txt");
+		ConsoleUI.out("Initializing...");
+		try {
+			f = new PrintStream("log.txt");
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
 		CommandHandler.init();
-		Log.out("Done!");
+		ConsoleUI.out("Done!");
 		
 		for (String c : args) {
-			Log.out("Recieved command \"" + c + "\" through command-line arguments");
+			ConsoleUI.out("Recieved command \"" + c + "\" through command-line arguments");
 			Command cmd = CommandHandler.getCommand(c);
 			if (cmd == null) {
-				Log.out("Unreconized command: " + c);
+				ConsoleUI.out("Unreconized command: " + c);
 				continue;
 			}
 			cmd.execute(new String[] {c});
 		}
 		
-		Log.out("Enter command:");
+		ConsoleUI.out("Enter command:");
 		
 		while (true) {
-			Log.outN("[] ");
+			ConsoleUI.outN("[] ");
 			
 			String cmd = sc.nextLine();
 			
-			Log.outF("Recieved command: " + cmd);
+			ConsoleUI.outF("Recieved command: " + cmd);
 			
 			if (cmd.matches("exit") || cmd.matches("exit .*")) terminate();
 			
 			try {
 				CommandHandler.parseCommand(cmd.split(" "));
 			} catch (ParameterException e) {
-				Log.out(e.getMessage());
+				ConsoleUI.out(e.getMessage());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -52,5 +59,27 @@ public class ConsoleUI {
 	private static void terminate() {
 		sc.close();
 		System.exit(0);
+	}
+	
+	public static void out(Object s) {
+		System.out.println(s);
+	}
+	/** No newline */
+	public static void outN(Object s) {
+		System.out.print(s);
+	}
+	
+	public static void warn(Object s) {
+		System.out.println("WARNING: " + s);
+	}
+	
+	
+	public static void outF(Object s) {
+		f.println(s);
+	}
+	public static void warnF(Object s) {
+		f.println(Ref.SEP);
+		f.println(s);
+		f.println(Ref.SEP);
 	}
 }

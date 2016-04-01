@@ -1,6 +1,6 @@
 package info.zthings.crawler.commands;
 
-import info.zthings.crawler.common.Log;
+import info.zthings.crawler.common.ConsoleUI;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -12,7 +12,7 @@ public class CommandHandler {
 	
 	public static void init() {
 		if (inited) {
-			Log.warn("CommandHandler is already inited!");
+			ConsoleUI.warn("CommandHandler is already inited!");
 			return;
 		}
 		
@@ -23,7 +23,7 @@ public class CommandHandler {
 	}
 	
 	public static void registerCommand(Command cmd) {
-		Log.outF("Registering command " + cmd.getName());
+		ConsoleUI.outF("Registering command " + cmd.getName());
 		cmdList.put(cmd.getName(), cmd);
 	}
 	
@@ -34,7 +34,7 @@ public class CommandHandler {
 				return;
 			}
 		}
-		Log.out("Unreconized command: '" + cmd[0].toLowerCase() + "'");
+		ConsoleUI.out("Unreconized command: '" + cmd[0].toLowerCase() + "'");
 	}
 	
 	public static Command getCommand(String n) {
