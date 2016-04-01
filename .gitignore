@@ -1,0 +1,20 @@
+# eclipse
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# general
+ignored/
+
+# repo specific
+log.txt
+bin/info
