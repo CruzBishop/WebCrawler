@@ -28,7 +28,7 @@ public class CommandHandler {
 		cmdList.put(cmd.getName(), cmd);
 	}
 	
-	public static void parseCommand(String[] cmd) {
+	public static void parseCommand(String ... cmd) {
 		if (cmd[0].matches("exit") || cmd[0].matches("exit .*")) ConsoleUI.terminate();
 		
 		for (String n : cmdList.keySet()) {

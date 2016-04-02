@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+/** Contains all links of a page */
 public class CrawlBuffer {
 	private ArrayList<String> strLinks = new ArrayList<String>();
 	private String source;
@@ -32,7 +33,11 @@ public class CrawlBuffer {
 		if (sb.length() > 0) csv.println(sb.toString().substring(0, sb.length()-2)); //delete last comma
 	}
 
-	public ArrayList<String> linkList() {
+	public ArrayList<String> getLinkList() {
 		return this.strLinks;
+	}
+
+	public String getSource() {
+		return this.source;
 	}
 }

@@ -87,13 +87,18 @@ public class DefaultCommands {
 
 		@Override
 		public String getHelpText() {
-			return "Displays the current status of memory";
+			return "Displays the current status of memory (use 1st param to get a specific index)";
 		}
 
 		@Override
 		public void execute(String[] params) {
-			ConsoleUI.out("Memory status: ");
-			ConsoleUI.out(Memory.squash());
+			if (params.length < 2) {
+				ConsoleUI.out("Memory status: ");
+				ConsoleUI.out(Memory.squash());
+			} else {
+				ConsoleUI.out("Memory key '" + params[1] + "' status:");
+				ConsoleUI.out(Memory.getKey(params[1]));
+			}
 		}
 	}
 	

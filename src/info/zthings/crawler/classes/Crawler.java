@@ -23,7 +23,7 @@ public class Crawler {
 	private String BASE_LOCATION = "crawls/date-" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + (Calendar.getInstance().get(Calendar.MONTH)+1) + "-" + Calendar.getInstance().get(Calendar.YEAR) + "/time-" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + "-" + Calendar.getInstance().get(Calendar.MINUTE) + "-" + Calendar.getInstance().get(Calendar.SECOND) + "/";
 	private String httploc;
 	private String name;
-	private CrawlBuffer buff = new CrawlBuffer();
+	private CrawlBuffer linkBuffer = new CrawlBuffer();
 	
 	public Crawler(String httploc) {
 		this.httploc = httploc;
@@ -44,11 +44,13 @@ public class Crawler {
 	}
 
 	public void start() {
+		//Setup streams
 		try {
 			File f = new File(BASE_LOCATION + "logs/" + this.name + ".log");
 			f.getParentFile().mkdirs();
 			f.createNewFile();
 			log = new PrintStream(f);
+			
 			f = new File(BASE_LOCATION + "csv/" + fileSafe(this.httploc) + ".csv");
 			f.getParentFile().mkdirs();
 			f.createNewFile();
@@ -58,7 +60,6 @@ public class Crawler {
 		}
 				
 		ConsoleUI.out("Started crawler-object with httploc: " + this.httploc + " and name: " + this.name + " (saving log at " + BASE_LOCATION + this.name + ")");
-		
 		log.println("CRAWLING AT "+this.httploc);
 		log.println(Ref.sep(12+this.httploc.length()));
 		log.println("Requesting document object...");
@@ -69,26 +70,28 @@ public class Crawler {
 				d = Jsoup.connect(this.httploc).get();
 			} catch (UnsupportedMimeTypeException e) {
 				log.println("File type not supported (" + this.httploc + ")");
-				Memory.addLink(this.httploc);
+				Memory.markLinkCrawled(this.httploc);
+				//Not needed cause the parent start() has linked it already
+				//Memory.addLink(this.source, this.httploc);
 				return;
 			}
-			this.buff.add(this.httploc, d.select("a[href]"));
-			this.buff.log(log);
-			this.buff.csv(csv);
-			Memory.addLink(this.httploc);
-			
-			//Start a crawler at all the found links
-			for (String s : this.buff.linkList()) {
+			this.linkBuffer.add(this.httploc, d.select("a[href]"));
+			this.linkBuffer.log(log);
+			this.linkBuffer.csv(csv);
+			Memory.markLinkCrawled(this.httploc);
+			Memory.registerLinks(this.linkBuffer);
+
+			//Add crawlers to the waiting stack
+			for (String s : this.linkBuffer.getLinkList()) {
 				if (!Memory.isCrawled(s)) {
-					ConsoleUI.out("Crawling " + s + " now, as it isn't in memory");
+					ConsoleUI.out("Adding crawler for " + s + " to the waiting stack, as it isn't in memory");
 					cleanup();
-					//NOW: no recursion, but use a "waiting stack"
-					new Crawler(s, "branch_#" + Memory.getNextBranchIndex() + "__" + fileSafe(s), this.BASE_LOCATION).start(); 
+					Memory.addToStack(new Crawler(s, "branch_#" + Memory.getNextBranchIndex() + "__" + fileSafe(s), this.BASE_LOCATION));
 				} else {
 					ConsoleUI.out("Not crawling " + s + " as it is already done in this session (branchindex: " + Memory.getBranchIndex(s) + ")");
-					
 				}
 			}
+			Memory.nextOnStack();
 		} catch (IllegalArgumentException e) { 
 			if (e.getCause() instanceof MalformedURLException) {
 				ConsoleUI.err("Invalid URL in memory (" + Memory.getCrawlLocation() + ")");
@@ -99,7 +102,7 @@ public class Crawler {
 			if (e.getStatusCode() == 404) {
 				ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
 				log.println("404: DOCUMENT DOESN'T EXIST");
-				Memory.addLink(this.httploc);
+				Memory.markLinkCrawled(this.httploc);
 			}
 		} catch (IOException e) {
 			log.println("Other IO exception occured");
@@ -111,5 +114,14 @@ public class Crawler {
 
 	private void cleanup() {
 		log.close();
+	}
+	
+	@Override
+	public String toString() {
+		return "http:" + this.httploc + ";name:" + this.name;
+	}
+	
+	public String getBaseLoc() {
+		return BASE_LOCATION;
 	}
 }
