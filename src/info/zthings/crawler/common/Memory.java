@@ -2,7 +2,6 @@ package info.zthings.crawler.common;
 
 import info.zthings.crawler.classes.CrawlBuffer;
 import info.zthings.crawler.classes.Crawler;
-import info.zthings.crawler.commands.CommandHandler;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -57,7 +56,6 @@ public class Memory {
 	public static void nextOnStack() {
 		ArrayList<Crawler> stack = ((ArrayList<Crawler>) m.get("stack"));
 		
-		CommandHandler.parseCommand("status", "stack");
 		String baseLocation = stack.get(0).getBaseLoc();
 		
 		stack.remove(0);
