@@ -15,6 +15,7 @@ out
 
 # general
 ignored/
+*.bat
 
 # repo specific
 log.txt
