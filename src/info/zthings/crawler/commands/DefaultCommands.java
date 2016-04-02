@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class DefaultCommands {
@@ -98,6 +99,37 @@ public class DefaultCommands {
 			} else {
 				ConsoleUI.out("Memory key '" + params[1] + "' status:");
 				ConsoleUI.out(Memory.getKey(params[1]));
+			}
+		}
+	}
+	
+	public static class Clear implements Command {
+		@Override
+		public String getName() {
+			return "clear";
+		}
+
+		@Override
+		public String getHelpText() {
+			return "Clears memory (use 1st param the clear specific entry)";
+		}
+
+		@Override
+		public void execute(String[] params) {
+			if (params.length < 2) {
+				ConsoleUI.out("Clearing memory...");
+				Memory.init();
+				CommandHandler.parseCommand("status");
+			} else {
+				HashMap<String, Object> m = Memory.getMap();
+				
+				if (params[1].equals("loc")) m.put("loc", Memory.loc_def_value);
+				if (params[1].equals("crawled")) m.put("crawled", Memory.crawled_def_value);
+				if (params[1].equals("stack")) m.put("stack", Memory.stack_def_value);
+				if (params[1].equals("links")) m.put("links", Memory.links_def_value);
+				
+				Memory.setMemory(m);
+				CommandHandler.parseCommand("status", params[1]);
 			}
 		}
 	}

@@ -14,11 +14,23 @@ import java.util.Map.Entry;
 public class Memory {
 	private static HashMap<String, Object> m = new HashMap<String, Object>();
 	
+	public static final Object loc_def_value = "";
+	public static final Object crawled_def_value = new ArrayList<String>();
+	public static final Object stack_def_value = new ArrayList<Crawler>();
+	public static final Object links_def_value = new HashMap<String, ArrayList<String>>();
+	
 	public static void init() {
-		m.put("loc", "");
-		m.put("crawled", new ArrayList<String>());
-		m.put("stack", new ArrayList<Crawler>());
-		m.put("links", new HashMap<String, ArrayList<String>>());
+		m.put("loc", loc_def_value);
+		m.put("crawled", crawled_def_value);
+		m.put("stack", stack_def_value);
+		m.put("links", links_def_value);
+	}
+	
+	public static HashMap<String, Object> getMap() {
+		return m;
+	}
+	public static void setMemory(HashMap<String, Object> map) {
+		m = map;
 	}
 	
 	public static String getCrawlLocation() {
