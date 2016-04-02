@@ -3,6 +3,7 @@ package info.zthings.crawler.commands;
 import info.zthings.crawler.classes.Crawler;
 import info.zthings.crawler.common.ConsoleUI;
 import info.zthings.crawler.common.Memory;
+import info.zthings.crawler.common.Ref;
 
 import java.util.Map.Entry;
 
@@ -71,7 +72,7 @@ public class DefaultCommands {
 		public void execute(String[] params) {
 			//FIXME: check for valid http
 			if (params.length < 2) throw new ParameterException(this);
-			Memory.setLocation(params[1]);
+			Memory.setCrawlLocation(params[1]);
 		}
 	}
 	
@@ -106,9 +107,11 @@ public class DefaultCommands {
 		}
 		@Override
 		public void execute(String[] params) {
-			ConsoleUI.out("Recieved request to start crawling at " + Memory.getLocation());
-			Crawler craw = new Crawler(Memory.getLocation());
+			ConsoleUI.out(Ref.SEP);
+			ConsoleUI.out("Recieved request to start a crawling session at " + Memory.getCrawlLocation());
+			Crawler craw = new Crawler(Memory.getCrawlLocation());
 			craw.start();
+			ConsoleUI.out(Ref.SEP);
 		}
 	}
 }

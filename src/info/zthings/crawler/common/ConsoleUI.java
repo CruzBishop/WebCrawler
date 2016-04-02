@@ -23,6 +23,7 @@ public class ConsoleUI {
 			e1.printStackTrace();
 		}
 		CommandHandler.init();
+		Memory.init();
 		ConsoleUI.out("Done!");
 		
 		for (String c : args) {

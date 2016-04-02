@@ -12,4 +12,14 @@ public class Util {
 		}
 		return buffer;
 	}
+
+	public static String implode(Object[] array, String glue) {
+		String[] buffer = new String[array.length];
+		
+		for (int i=0; i<array.length; i++) {
+			buffer[i] = array[i].toString();
+		}
+		
+		return implode(buffer, glue);
+	}
 }
