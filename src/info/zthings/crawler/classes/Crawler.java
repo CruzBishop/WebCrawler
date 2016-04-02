@@ -36,11 +36,7 @@ public class Crawler {
 	}
 
 	private String fileSafe(String s) {
-		if (s.indexOf("?") > -1) {
-			s = s.substring(0, s.indexOf("?"));
-		}
-		s = s.replace("http://", "").replace("https://", "").replace("www.", "").replace(".", "_").replace("/", "-");
-		return s;
+		return s.replace("http://", "").replace("https://", "").replace("www.", "").replace(".", "_").replace("/", "-").replace("?", "_que_").replace("&", "_amp_");
 	}
 
 	public void start() {
@@ -73,8 +69,33 @@ public class Crawler {
 				Memory.markLinkCrawled(this.httploc);
 				//Not needed cause the parent start() has linked it already
 				//Memory.addLink(this.source, this.httploc);
+				Memory.nextOnStack();
+				return;
+			} catch (HttpStatusException e) {
+				if (e.getStatusCode() == 404) {
+					ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
+					log.println("404: DOCUMENT DOESN'T EXIST");
+					Memory.markLinkCrawled(this.httploc);
+				} else if (e.getStatusCode() == 403) {
+					ConsoleUI.warn("Acces denied (403): " + this.httploc);
+					log.println("403: ACCES DENIED");
+					Memory.markLinkCrawled(this.httploc);
+				} else {
+					e.printStackTrace();
+					return;
+				}
+				Memory.nextOnStack();
+				return;
+			} catch (IOException e) {
+				log.println("Other IO exception occured");
+				e.printStackTrace();
+				return;
+			} catch (Exception e) {
+				log.println("Other exception occured");
+				e.printStackTrace();
 				return;
 			}
+			
 			this.linkBuffer.add(this.httploc, d.select("a[href]"));
 			this.linkBuffer.log(log);
 			this.linkBuffer.csv(csv);
@@ -98,14 +119,8 @@ public class Crawler {
 				log.println("URL is invalid for Java: " + this.httploc);
 			}
 			e.printStackTrace(log);
-		} catch (HttpStatusException e) {
-			if (e.getStatusCode() == 404) {
-				ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
-				log.println("404: DOCUMENT DOESN'T EXIST");
-				Memory.markLinkCrawled(this.httploc);
-			}
-		} catch (IOException e) {
-			log.println("Other IO exception occured");
+		} catch (Exception e) {
+			log.println("Other exception occured");
 			e.printStackTrace();
 		} finally {
 			cleanup();
