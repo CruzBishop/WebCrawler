@@ -80,9 +80,14 @@ public class Crawler {
 					ConsoleUI.warn("Acces denied (403): " + this.httploc);
 					log.println("403: ACCES DENIED");
 					Memory.markLinkCrawled(this.httploc);
+				} else if (e.getStatusCode() == 503) { 
+					ConsoleUI.warn("Service unavaillable (503): " + this.httploc);
+					log.println("503: SERVICE UNAVAILABLE");
+					Memory.markLinkCrawled(this.httploc);
 				} else {
-					e.printStackTrace();
-					return;
+					ConsoleUI.warn("Other HttpStatus error (" + e.getStatusCode() + "): " + this.httploc);
+					log.println("HTTPSTATUS ERROR: " + e.getStatusCode());
+					Memory.markLinkCrawled(this.httploc);
 				}
 				Memory.nextOnStack();
 				return;
