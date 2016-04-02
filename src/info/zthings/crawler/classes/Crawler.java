@@ -12,23 +12,25 @@ import java.util.Calendar;
 
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
+import org.jsoup.UnsupportedMimeTypeException;
 import org.jsoup.nodes.Document;
 
 
 public class Crawler {
 	//TODO: dual-stream with ConsoleUI & logfile?
 	private PrintStream log;
-	private String BASE_LOCATION = "crawls/date-" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + Calendar.getInstance().get(Calendar.MONTH) + "-" + Calendar.getInstance().get(Calendar.YEAR) + "/time-" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + "-" + Calendar.getInstance().get(Calendar.MINUTE) + "-" + Calendar.getInstance().get(Calendar.SECOND) + "/";
-	private String loc;
+	private PrintStream csv;
+	private String BASE_LOCATION = "crawls/date-" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + (Calendar.getInstance().get(Calendar.MONTH)+1) + "-" + Calendar.getInstance().get(Calendar.YEAR) + "/time-" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + "-" + Calendar.getInstance().get(Calendar.MINUTE) + "-" + Calendar.getInstance().get(Calendar.SECOND) + "/";
+	private String httploc;
 	private String name;
 	private CrawlBuffer buff = new CrawlBuffer();
 	
 	public Crawler(String httploc) {
-		this.loc = httploc;
+		this.httploc = httploc;
 		this.name = "branch_#0__" + fileSafe(httploc);
 	}
 	public Crawler(String httploc, String name, String base_location) {
-		this.loc = httploc;
+		this.httploc = httploc;
 		this.name = fileSafe(name);
 		this.BASE_LOCATION = base_location;
 	}
@@ -43,31 +45,44 @@ public class Crawler {
 
 	public void start() {
 		try {
-			new File(BASE_LOCATION).mkdirs();
-			File f = new File(BASE_LOCATION + this.name + ".log");
+			File f = new File(BASE_LOCATION + "logs/" + this.name + ".log");
+			f.getParentFile().mkdirs();
 			f.createNewFile();
 			log = new PrintStream(f);
+			f = new File(BASE_LOCATION + "csv/" + fileSafe(this.httploc) + ".csv");
+			f.getParentFile().mkdirs();
+			f.createNewFile();
+			csv = new PrintStream(f);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+				
+		ConsoleUI.out("Started crawler-object with httploc: " + this.httploc + " and name: " + this.name + " (saving log at " + BASE_LOCATION + this.name + ")");
 		
-		ConsoleUI.out("Started crawler-object with httploc: " + this.loc + " and name: " + this.name + " (saving log at " + BASE_LOCATION + this.name + ")");
-		
-		log.println("CRAWLING AT "+this.loc);
-		log.println(Ref.sep(12+this.loc.length()));
+		log.println("CRAWLING AT "+this.httploc);
+		log.println(Ref.sep(12+this.httploc.length()));
 		log.println("Requesting document object...");
 		
 		try {
-			Document d = Jsoup.connect(this.loc).get();
-			this.buff.add(this.loc, d.select("a[href]"));
+			Document d;
+			try {
+				d = Jsoup.connect(this.httploc).get();
+			} catch (UnsupportedMimeTypeException e) {
+				log.println("File type not supported (" + this.httploc + ")");
+				Memory.addLink(this.httploc);
+				return;
+			}
+			this.buff.add(this.httploc, d.select("a[href]"));
 			this.buff.log(log);
-			Memory.addLink(this.loc);
+			this.buff.csv(csv);
+			Memory.addLink(this.httploc);
 			
 			//Start a crawler at all the found links
 			for (String s : this.buff.linkList()) {
 				if (!Memory.isCrawled(s)) {
 					ConsoleUI.out("Crawling " + s + " now, as it isn't in memory");
 					cleanup();
+					//NOW: no recursion, but use a "waiting stack"
 					new Crawler(s, "branch_#" + Memory.getNextBranchIndex() + "__" + fileSafe(s), this.BASE_LOCATION).start(); 
 				} else {
 					ConsoleUI.out("Not crawling " + s + " as it is already done in this session (branchindex: " + Memory.getBranchIndex(s) + ")");
@@ -77,14 +92,14 @@ public class Crawler {
 		} catch (IllegalArgumentException e) { 
 			if (e.getCause() instanceof MalformedURLException) {
 				ConsoleUI.err("Invalid URL in memory (" + Memory.getCrawlLocation() + ")");
-				log.println("URL is invalid for Java: " + this.loc);
+				log.println("URL is invalid for Java: " + this.httploc);
 			}
 			e.printStackTrace(log);
 		} catch (HttpStatusException e) {
 			if (e.getStatusCode() == 404) {
-				ConsoleUI.warn("Link (" + this.loc + ") is broken!");
+				ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
 				log.println("404: DOCUMENT DOESN'T EXIST");
-				Memory.addLink(this.loc);
+				Memory.addLink(this.httploc);
 			}
 		} catch (IOException e) {
 			log.println("Other IO exception occured");

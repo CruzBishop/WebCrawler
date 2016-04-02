@@ -24,8 +24,15 @@ public class CrawlBuffer {
 		}
 	}
 
+	public void csv(PrintStream csv) {
+		StringBuilder sb = new StringBuilder();
+		for (String s : strLinks) {
+			sb.append(s + ",");
+		}
+		if (sb.length() > 0) csv.println(sb.toString().substring(0, sb.length()-2)); //delete last comma
+	}
+
 	public ArrayList<String> linkList() {
 		return this.strLinks;
 	}
-	
 }

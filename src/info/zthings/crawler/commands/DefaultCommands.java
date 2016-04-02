@@ -5,6 +5,7 @@ import info.zthings.crawler.classes.Crawler;
 import info.zthings.crawler.common.ConsoleUI;
 import info.zthings.crawler.common.Memory;
 import info.zthings.crawler.common.Ref;
+import info.zthings.crawler.common.Util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,7 +34,6 @@ public class DefaultCommands {
 				//First get the longest name
 				for (Entry<String, Command> en : CommandHandler.getCommandList()) {
 					if (en.getKey().length() > longestlength) {
-						ConsoleUI.outF(en.getKey().length() + " > " + longestlength + " making it the longestlength");
 						longestlength = en.getKey().length();
 						longestkey = en.getKey();
 					}
@@ -43,10 +43,8 @@ public class DefaultCommands {
 				int nTabs = longestlength/10+1;
 				String tabs = "\t";
 				for (int i=0; i<nTabs; i++) {
-					ConsoleUI.outF("Appending " + i + "st tab");
 					tabs += "\t";
 				}
-				ConsoleUI.outF("Tab result: " + tabs);
 				
 				//Format & print all the entries
 				for (Entry<String, Command> en : CommandHandler.getCommandList()) {
@@ -151,7 +149,7 @@ public class DefaultCommands {
 				reader.close();
 			} catch (FileNotFoundException e) {
 				ConsoleUI.out("Script '" + s + "' doesn't exist");
-				ConsoleUI.outF("Requested script file '" + f.getAbsolutePath() + "' doesn't exist");
+				Util.fNotice("Requested script file '" + f.getAbsolutePath() + "' doesn't exist");
 			} catch (IOException e) {
 				ConsoleUI.out("Other IO exception");
 				e.printStackTrace();

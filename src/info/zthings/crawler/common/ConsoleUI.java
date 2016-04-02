@@ -4,23 +4,16 @@ import info.zthings.crawler.classes.Command;
 import info.zthings.crawler.commands.CommandHandler;
 import info.zthings.crawler.commands.ParameterException;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.Scanner;
 
 public class ConsoleUI {
 	private static Scanner sc = new Scanner(System.in);
-	private static PrintStream f;
 	
 	public static void main(String[] args) {
 		ConsoleUI.out("CRAWLER v" + Ref.VER);
 		ConsoleUI.out(Ref.sep(9+Ref.VER.length()));
 		
-		try {
-			f = new PrintStream("log.txt");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
+		Util.init();
 		CommandHandler.init();
 		Memory.init();
 		
@@ -56,8 +49,6 @@ public class ConsoleUI {
 			
 			String cmd = sc.nextLine();
 			
-			ConsoleUI.outF("Recieved command: " + cmd);
-			
 			if (cmd.matches("exit") || cmd.matches("exit .*")) terminate();
 			
 			try {
@@ -69,6 +60,7 @@ public class ConsoleUI {
 			}
 		}
 	}
+	
 
 	public static void terminate() {
 		sc.close();
@@ -88,16 +80,6 @@ public class ConsoleUI {
 	}
 	public static void err(String s) {
 		System.out.println("ERROR: " + s);
-	}
-	
-	
-	public static void outF(Object s) {
-		f.println(s);
-	}
-	public static void warnF(Object s) {
-		f.println(Ref.sep());
-		f.println(s);
-		f.println(Ref.sep());
 	}
 
 }

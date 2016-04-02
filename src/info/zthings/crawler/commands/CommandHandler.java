@@ -25,7 +25,6 @@ public class CommandHandler {
 	}
 	
 	public static void registerCommand(Command cmd) {
-		ConsoleUI.outF("Registering command " + cmd.getName());
 		cmdList.put(cmd.getName(), cmd);
 	}
 	
