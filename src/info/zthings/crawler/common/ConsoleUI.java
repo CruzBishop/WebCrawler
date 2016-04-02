@@ -16,15 +16,13 @@ public class ConsoleUI {
 		ConsoleUI.out("CRAWLER v" + Ref.VER);
 		ConsoleUI.out(Ref.SEP.substring(0, 9+Ref.VER.length()));
 		
-		ConsoleUI.out("Initializing...");
 		try {
 			f = new PrintStream("log.txt");
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		}
 		CommandHandler.init();
 		Memory.init();
-		ConsoleUI.out("Done!");
 		
 		for (String c : args) {
 			ConsoleUI.out("Recieved command \"" + c + "\" through command-line arguments");
@@ -52,8 +50,7 @@ public class ConsoleUI {
 			cmd.execute(b);
 		}
 		
-		ConsoleUI.out("Enter command:");
-		
+		//Entering main loop
 		while (true) {
 			ConsoleUI.outN("[] ");
 			
@@ -89,6 +86,9 @@ public class ConsoleUI {
 	public static void warn(Object s) {
 		System.out.println("WARNING: " + s);
 	}
+	public static void err(String s) {
+		System.out.println("ERROR: " + s);
+	}
 	
 	
 	public static void outF(Object s) {
@@ -99,4 +99,5 @@ public class ConsoleUI {
 		f.println(s);
 		f.println(Ref.SEP);
 	}
+
 }

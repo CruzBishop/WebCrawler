@@ -111,6 +111,11 @@ public class DefaultCommands {
 		public void execute(String[] params) {
 			ConsoleUI.out(Ref.SEP);
 			ConsoleUI.out("Recieved request to start a crawling session at " + Memory.getCrawlLocation());
+			if (Memory.getCrawlLocation().equals("")) {
+				ConsoleUI.err("No location in memory. Use help setlocation for more info");
+				ConsoleUI.out(Ref.SEP);
+				return;
+			}
 			Crawler craw = new Crawler(Memory.getCrawlLocation());
 			craw.start();
 			ConsoleUI.out(Ref.SEP);

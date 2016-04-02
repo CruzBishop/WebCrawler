@@ -66,7 +66,10 @@ public class Crawler {
 				}
 			}
 		} catch (IllegalArgumentException e) { 
-			if (e.getCause() instanceof MalformedURLException) log.println("URL is invalid for Java: " + this.loc);
+			if (e.getCause() instanceof MalformedURLException) {
+				ConsoleUI.err("Invalid URL in memory (" + Memory.getCrawlLocation() + ")");
+				log.println("URL is invalid for Java: " + this.loc);
+			}
 			e.printStackTrace(log);
 		} catch (HttpStatusException e) {
 			if (e.getStatusCode() == 404) {
