@@ -1,6 +1,6 @@
 package info.zthings.crawler.common;
 
-import info.zthings.crawler.commands.Command;
+import info.zthings.crawler.classes.Command;
 import info.zthings.crawler.commands.CommandHandler;
 import info.zthings.crawler.commands.ParameterException;
 
@@ -14,7 +14,7 @@ public class ConsoleUI {
 	
 	public static void main(String[] args) {
 		ConsoleUI.out("CRAWLER v" + Ref.VER);
-		ConsoleUI.out(Ref.SEP.substring(0, 9+Ref.VER.length()));
+		ConsoleUI.out(Ref.sep(9+Ref.VER.length()));
 		
 		try {
 			f = new PrintStream("log.txt");
@@ -95,9 +95,9 @@ public class ConsoleUI {
 		f.println(s);
 	}
 	public static void warnF(Object s) {
-		f.println(Ref.SEP);
+		f.println(Ref.sep());
 		f.println(s);
-		f.println(Ref.SEP);
+		f.println(Ref.sep());
 	}
 
 }

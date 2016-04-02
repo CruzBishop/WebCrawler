@@ -1,4 +1,4 @@
-package info.zthings.crawler.commands;
+package info.zthings.crawler.classes;
 
 public interface Command {
 	public abstract String getName();

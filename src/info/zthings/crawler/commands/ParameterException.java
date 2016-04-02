@@ -1,5 +1,7 @@
 package info.zthings.crawler.commands;
 
+import info.zthings.crawler.classes.Command;
+
 public class ParameterException extends RuntimeException {
 		private static final long serialVersionUID = -62975215326790L;
 

@@ -1,5 +1,6 @@
 package info.zthings.crawler.commands;
 
+import info.zthings.crawler.classes.Command;
 import info.zthings.crawler.classes.Crawler;
 import info.zthings.crawler.common.ConsoleUI;
 import info.zthings.crawler.common.Memory;
@@ -109,16 +110,16 @@ public class DefaultCommands {
 		}
 		@Override
 		public void execute(String[] params) {
-			ConsoleUI.out(Ref.SEP);
+			ConsoleUI.out(Ref.sep(48+Memory.getCrawlLocation().length()));
 			ConsoleUI.out("Recieved request to start a crawling session at " + Memory.getCrawlLocation());
 			if (Memory.getCrawlLocation().equals("")) {
 				ConsoleUI.err("No location in memory. Use help setlocation for more info");
-				ConsoleUI.out(Ref.SEP);
+				ConsoleUI.out(Ref.sep(48+Memory.getCrawlLocation().length()));
 				return;
 			}
 			Crawler craw = new Crawler(Memory.getCrawlLocation());
 			craw.start();
-			ConsoleUI.out(Ref.SEP);
+			ConsoleUI.out(Ref.sep(48+Memory.getCrawlLocation().length()));
 		}
 	}
 

@@ -18,24 +18,33 @@ import org.jsoup.nodes.Document;
 public class Crawler {
 	//TODO: dual-stream with ConsoleUI & logfile?
 	private PrintStream log;
-	private final String BASE_LOCATION = "crawls/date-" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + Calendar.getInstance().get(Calendar.MONTH) + "-" + Calendar.getInstance().get(Calendar.YEAR) + "/time-" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + "-" + Calendar.getInstance().get(Calendar.MINUTE) + "-" + Calendar.getInstance().get(Calendar.SECOND) + "/";
+	private String BASE_LOCATION = "crawls/date-" + Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "-" + Calendar.getInstance().get(Calendar.MONTH) + "-" + Calendar.getInstance().get(Calendar.YEAR) + "/time-" + Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + "-" + Calendar.getInstance().get(Calendar.MINUTE) + "-" + Calendar.getInstance().get(Calendar.SECOND) + "/";
 	private String loc;
 	private String name;
 	private CrawlBuffer buff = new CrawlBuffer();
 	
 	public Crawler(String httploc) {
 		this.loc = httploc;
-		this.name = "start.log";
+		this.name = "branch_#0__" + fileSafe(httploc);
 	}
-	public Crawler(String httploc, String name) {
+	public Crawler(String httploc, String name, String base_location) {
 		this.loc = httploc;
-		this.name = name;
+		this.name = fileSafe(name);
+		this.BASE_LOCATION = base_location;
+	}
+
+	private String fileSafe(String s) {
+		if (s.indexOf("?") > -1) {
+			s = s.substring(0, s.indexOf("?"));
+		}
+		s = s.replace("http://", "").replace("https://", "").replace("www.", "").replace(".", "_").replace("/", "-");
+		return s;
 	}
 
 	public void start() {
 		try {
 			new File(BASE_LOCATION).mkdirs();
-			File f = new File(BASE_LOCATION + this.name);
+			File f = new File(BASE_LOCATION + this.name + ".log");
 			f.createNewFile();
 			log = new PrintStream(f);
 		} catch (IOException e) {
@@ -45,7 +54,7 @@ public class Crawler {
 		ConsoleUI.out("Started crawler-object with httploc: " + this.loc + " and name: " + this.name + " (saving log at " + BASE_LOCATION + this.name + ")");
 		
 		log.println("CRAWLING AT "+this.loc);
-		log.println(Ref.SEP.substring(0, 12+this.loc.length()));
+		log.println(Ref.sep(12+this.loc.length()));
 		log.println("Requesting document object...");
 		
 		try {
@@ -59,7 +68,7 @@ public class Crawler {
 				if (!Memory.isCrawled(s)) {
 					ConsoleUI.out("Crawling " + s + " now, as it isn't in memory");
 					cleanup();
-					new Crawler(s, "branch_#" + Memory.getNextBranchIndex() + "__" + s.replace("http://", "").replace("www.", "").replace(".", "_").replace("/", "-")+".log").start(); 
+					new Crawler(s, "branch_#" + Memory.getNextBranchIndex() + "__" + fileSafe(s), this.BASE_LOCATION).start(); 
 				} else {
 					ConsoleUI.out("Not crawling " + s + " as it is already done in this session (branchindex: " + Memory.getBranchIndex(s) + ")");
 					

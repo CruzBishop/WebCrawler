@@ -1,5 +1,6 @@
 package info.zthings.crawler.commands;
 
+import info.zthings.crawler.classes.Command;
 import info.zthings.crawler.common.ConsoleUI;
 
 import java.util.HashMap;
