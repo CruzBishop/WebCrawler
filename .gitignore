@@ -20,3 +20,4 @@ ignored/
 # repo specific
 log.txt
 crawls/
+*.cr

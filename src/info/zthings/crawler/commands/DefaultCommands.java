@@ -5,6 +5,11 @@ import info.zthings.crawler.common.ConsoleUI;
 import info.zthings.crawler.common.Memory;
 import info.zthings.crawler.common.Ref;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Map.Entry;
 
 public class DefaultCommands {
@@ -58,7 +63,6 @@ public class DefaultCommands {
 		}
 	}
 
-
 	public static class SetLocation implements Command {
 		@Override
 		public String getName() {
@@ -75,7 +79,6 @@ public class DefaultCommands {
 			Memory.setCrawlLocation(params[1]);
 		}
 	}
-	
 	
 	public static class Status implements Command {
 		@Override
@@ -95,7 +98,6 @@ public class DefaultCommands {
 		}
 	}
 	
-	
 	public static class Crawl implements Command {
 		@Override
 		public String getName() {
@@ -112,6 +114,42 @@ public class DefaultCommands {
 			Crawler craw = new Crawler(Memory.getCrawlLocation());
 			craw.start();
 			ConsoleUI.out(Ref.SEP);
+		}
+	}
+
+	public static class Exec implements Command {
+		@Override
+		public String getName() {
+			return "exec";
+		}
+
+		@Override
+		public String getHelpText() {
+			return "Executes the *.cr script specified in the 1st param";
+		}
+
+		@Override
+		public void execute(String[] params) {
+			if (params.length < 2) throw new ParameterException(this);
+			String s = params[1];
+			if (s.indexOf(".") < 0) s += ".cr"; //add default extension
+			
+			File f = new File(s);
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(f));
+				String l;
+				while ((l = reader.readLine()) != null) {
+					ConsoleUI.out("[] " + l.split(" ")[0]);
+					CommandHandler.parseCommand(l.split(" "));
+				}
+				reader.close();
+			} catch (FileNotFoundException e) {
+				ConsoleUI.out("Script '" + s + "' doesn't exist");
+				ConsoleUI.outF("Requested script file '" + f.getAbsolutePath() + "' doesn't exist");
+			} catch (IOException e) {
+				ConsoleUI.out("Other IO exception");
+				e.printStackTrace();
+			}
 		}
 	}
 }

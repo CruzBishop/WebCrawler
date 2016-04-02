@@ -20,6 +20,7 @@ public class CommandHandler {
 		registerCommand(new DefaultCommands.SetLocation());
 		registerCommand(new DefaultCommands.Crawl());
 		registerCommand(new DefaultCommands.Status());
+		registerCommand(new DefaultCommands.Exec());
 	}
 	
 	public static void registerCommand(Command cmd) {
