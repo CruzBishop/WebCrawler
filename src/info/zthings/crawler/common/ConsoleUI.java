@@ -28,12 +28,28 @@ public class ConsoleUI {
 		
 		for (String c : args) {
 			ConsoleUI.out("Recieved command \"" + c + "\" through command-line arguments");
+			
+			String[] b;
+			if (c.indexOf("]") > c.indexOf("[")) {
+				String[] p = c.substring(c.indexOf("[")+1, c.indexOf("]")).split(",");
+				ConsoleUI.out("Recieved params [" + Util.implode(p, ",") + "]");
+				c = c.substring(0, c.indexOf("["));
+				
+				b = new String[p.length+1];
+				b[0] = c;
+				for (int i=0; i<p.length; i++) {
+					b[1+i] = p[i];
+				}
+			} else {
+				b = new String[] {c};
+			}
+			
 			Command cmd = CommandHandler.getCommand(c);
 			if (cmd == null) {
 				ConsoleUI.out("Unreconized command: " + c);
 				continue;
 			}
-			cmd.execute(new String[] {c});
+			cmd.execute(b);
 		}
 		
 		ConsoleUI.out("Enter command:");
@@ -57,7 +73,7 @@ public class ConsoleUI {
 		}
 	}
 
-	private static void terminate() {
+	public static void terminate() {
 		sc.close();
 		System.exit(0);
 	}
