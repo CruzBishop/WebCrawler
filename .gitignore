@@ -1,4 +1,5 @@
 # eclipse
+bin
 *.launch
 .settings
 .metadata
@@ -17,5 +18,4 @@ ignored/
 
 # repo specific
 log.txt
-bin/info
 crawls/
