@@ -21,3 +21,4 @@ ignored/
 important_notices.log
 crawls/
 *.cr
+*.sav
