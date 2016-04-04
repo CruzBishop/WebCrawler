@@ -12,10 +12,50 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 public class DefaultCommands {
+	//NOW output command to save memory
+	public static class Output implements Command {
+		@Override
+		public String getName() {
+			return "output";
+		}
+
+		@Override
+		public String getHelpText() {
+			return "Flushes memory in result.cwr file\nUse first param for the location of result.cwr, or else the most recent one in Memory is used";
+		}
+
+		@Override
+		public void execute(String[] params) {
+			String lBuff;
+			if (params.length < 2) lBuff = Memory.getBaseLoc();
+			else lBuff = params[1];
+			
+			try {
+				PrintStream st = new PrintStream(lBuff + "result.cwr");
+				HashMap<String, ArrayList<String>> links = (HashMap<String, ArrayList<String>>) Memory.getLinks();
+				
+				for (Entry<String, ArrayList<String>> en : links.entrySet()) {
+					st.println("#"+en.getKey());
+					for (String l : en.getValue()) {
+						st.println(l + ",");
+					}
+				}
+				
+				st.close();
+				
+				CommandHandler.parseCommand("clear", "links");
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static class Help implements Command {
 		@Override
 		public String getName() {
@@ -75,7 +115,7 @@ public class DefaultCommands {
 		@Override
 		public void execute(String[] params) {
 			//FIXME: check for valid http
-			if (params.length < 2) throw new ParameterException(this);
+			if (params.length < 2) ParameterException.e(this);
 			Memory.setCrawlLocation(params[1]);
 		}
 	}
@@ -127,6 +167,7 @@ public class DefaultCommands {
 				if (params[1].equals("crawled")) m.put("crawled", Memory.crawled_def_value);
 				if (params[1].equals("stack")) m.put("stack", Memory.stack_def_value);
 				if (params[1].equals("links")) m.put("links", Memory.links_def_value);
+				if (params[1].equals("base_loc")) m.put("base_loc", Memory.base_loc_def_value);
 				
 				Memory.setMemory(m);
 				CommandHandler.parseCommand("status", params[1]);
@@ -171,7 +212,7 @@ public class DefaultCommands {
 
 		@Override
 		public void execute(String[] params) {
-			if (params.length < 2) throw new ParameterException(this);
+			if (params.length < 2) ParameterException.e(this);
 			String s = params[1];
 			if (s.indexOf(".") < 0) s += ".cr"; //add default extension
 			

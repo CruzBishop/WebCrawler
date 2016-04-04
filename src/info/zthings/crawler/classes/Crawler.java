@@ -42,6 +42,13 @@ public class Crawler {
 
 	public void start() {
 		//Setup streams
+		/* FIXME issues with test-build 1
+		 * Branch number doesn't increase
+		 * mailto link create mailto-file (no extension
+		 * Double-stream StdOut to Console & file (easier debugging)
+		 * The important_notices folder must be placed as a name-specific thingy
+		 * 		Maybe give random ID to filename and print that ID to the console 
+		 */
 		try {
 			File f = new File(BASE_LOCATION + "logs/" + this.name + ".log");
 			f.getParentFile().mkdirs();

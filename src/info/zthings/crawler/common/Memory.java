@@ -2,9 +2,8 @@ package info.zthings.crawler.common;
 
 import info.zthings.crawler.classes.CrawlBuffer;
 import info.zthings.crawler.classes.Crawler;
+import info.zthings.crawler.commands.CommandHandler;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,15 +13,18 @@ public class Memory {
 	private static HashMap<String, Object> m = new HashMap<String, Object>();
 	
 	public static final Object loc_def_value = "";
+	public static final Object base_loc_def_value = "";
 	public static final Object crawled_def_value = new ArrayList<String>();
 	public static final Object stack_def_value = new ArrayList<Crawler>();
 	public static final Object links_def_value = new HashMap<String, ArrayList<String>>();
 	
 	public static void init() {
+		//FIXME crawls & links aren't cleared
 		m.put("loc", loc_def_value);
 		m.put("crawled", crawled_def_value);
 		m.put("stack", stack_def_value);
 		m.put("links", links_def_value);
+		m.put("base_loc", base_loc_def_value);
 	}
 	
 	public static HashMap<String, Object> getMap() {
@@ -55,30 +57,24 @@ public class Memory {
 	@SuppressWarnings("unchecked")
 	public static void nextOnStack() {
 		ArrayList<Crawler> stack = ((ArrayList<Crawler>) m.get("stack"));
-		
-		String baseLocation = stack.get(0).getBaseLoc();
-		
+		//FIXME crashes if 403 on first page (IndexOutOfBoundsException)
+		setBaseLoc(stack.get(0).getBaseLoc());		
 		stack.remove(0);
 		m.put("stack", stack);
+		
 		if (stack.size() > 0) stack.get(0).start();
 		else {
-			ConsoleUI.out("Waiting stack is empty, flushing link data into " + baseLocation + "result.cwr");
-			try {
-				PrintStream st = new PrintStream(baseLocation + "result.cwr");
-				HashMap<String, ArrayList<String>> links = (HashMap<String, ArrayList<String>>) m.get("links");
-				
-				for (Entry<String, ArrayList<String>> en : links.entrySet()) {
-					st.println("#"+en.getKey());
-					for (String l : en.getValue()) {
-						st.println(l + ",");
-					}
-				}
-				
-				st.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
+			ConsoleUI.out("Waiting stack is empty, flushing link data into " + getBaseLoc() + "result.cwr");
+			CommandHandler.parseCommand("output");
 		}
+	}
+	
+	public static void setBaseLoc(String loc) {
+		m.put("base_loc", loc);
+	}
+	
+	public static String getBaseLoc() {
+		return (String)m.get("base_loc");
 	}
 	
 	
@@ -127,8 +123,13 @@ public class Memory {
 		HashMap<String, ArrayList<String>> cMap = ((HashMap<String, ArrayList<String>>)m.get("links"));
 		cMap.put(buffer.getSource(), buffer.getLinkList());
 	}
-
+	
 	public static Object getKey(String s) {
 		return m.get(s);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, ArrayList<String>> getLinks() {
+		return (HashMap<String, ArrayList<String>>) m.get("links");
 	}
 }

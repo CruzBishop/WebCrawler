@@ -2,7 +2,6 @@ package info.zthings.crawler.common;
 
 import info.zthings.crawler.classes.Command;
 import info.zthings.crawler.commands.CommandHandler;
-import info.zthings.crawler.commands.ParameterException;
 
 import java.util.Scanner;
 
@@ -51,13 +50,7 @@ public class ConsoleUI {
 			
 			if (cmd.matches("exit") || cmd.matches("exit .*")) terminate();
 			
-			try {
-				CommandHandler.parseCommand(cmd.split(" "));
-			} catch (ParameterException e) {
-				ConsoleUI.out(e.getMessage());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+			CommandHandler.parseCommand(cmd.split(" "));
 		}
 	}
 	
