@@ -16,9 +16,8 @@ out
 # general
 ignored/
 *.bat
+*.log
 
 # repo specific
-important_notices.log
-crawls/
 *.cr
-*.sav
+*.dat

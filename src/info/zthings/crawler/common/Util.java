@@ -1,43 +1,82 @@
 package info.zthings.crawler.common;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import info.zthings.crawler.classes.ENCLOSIONS;
+import info.zthings.crawler.classes.IImplodable;
+
+import java.net.URL;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 
 public class Util {
-	private static PrintStream fs;
-	
 	private Util() {}
 	
-	public static void init() {
-		try {
-			fs = new PrintStream("important_notices.log");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		System.setErr(fs);
+	public static String formatDate(String str) {
+		Calendar c = Calendar.getInstance();
+		str = str.replaceAll("%d%", String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
+		str = str.replaceAll("%m%", String.valueOf(c.get(Calendar.MONTH+1))); //cause january = 0
+		str = str.replaceAll("%y%", String.valueOf(c.get(Calendar.YEAR)));
+		str = str.replaceAll("%h%", String.valueOf(c.get(Calendar.HOUR_OF_DAY)));
+		str = str.replaceAll("%m%", String.valueOf(c.get(Calendar.MINUTE)));
+		str = str.replaceAll("%s%", String.valueOf(c.get(Calendar.SECOND)));
+		return str;
 	}
 	
-	public static String implode(String[] array, String glue) {
-		String buffer = "";
-		for (int i=0; i<array.length; i++) {
-			if (i>0) {
-				buffer += glue + array[i];
-			} else buffer += array[i];
+	public static String implode(Iterable<?> list, String glue, ENCLOSIONS encloser) {
+		Iterator<?> it = list.iterator();
+		
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(ENCLOSIONS.getOpening(encloser));
+		
+		while (it.hasNext()) {
+			Object o = it.next();
+			
+			if (!(o instanceof Iterable)) sb.append(o);
+			else sb.append(implode((Iterable<?>) o, glue, encloser));
+			
+			sb.append(glue);
 		}
-		return buffer;
+		
+		sb.substring(0, sb.length()-glue.length()); //remove last bit of glue
+		
+		sb.append(ENCLOSIONS.getClosing(encloser));
+		
+		return sb.toString();
+	}
+	public static String implode(Object[] array, String glue, ENCLOSIONS encloser) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ENCLOSIONS.getOpening(encloser));
+		for (Object o : array) {
+			sb.append(o.toString());
+			sb.append(glue);
+		}
+		sb.substring(0, sb.length()-glue.length()); //remove last bit of glue
+		sb.append(ENCLOSIONS.getClosing(encloser));
+		return sb.toString();
+	}
+	public static String implode(Map<?, ?> map, String glue, ENCLOSIONS encloser) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ENCLOSIONS.getOpening(encloser));
+		for (Entry<?, ?> en : map.entrySet()) {
+			sb.append(en.getKey() + "=" + en.getValue() + glue);
+		}
+		sb.substring(0, sb.length()-glue.length()); //remove last bit of glue
+		sb.append(ENCLOSIONS.getClosing(encloser));
+		return sb.toString();
+	}
+	public static String implode(IImplodable obj, String glue, ENCLOSIONS encloser) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ENCLOSIONS.getOpening(encloser));
+		sb.append(obj.implode(glue));
+		sb.substring(0, sb.length()-glue.length()); //remove last bit of glue
+		sb.append(ENCLOSIONS.getClosing(encloser));
+		return sb.toString();
 	}
 
-	public static String implode(Object[] array, String glue) {
-		String[] buffer = new String[array.length];
-		
-		for (int i=0; i<array.length; i++) {
-			buffer[i] = array[i].toString();
-		}
-		
-		return implode(buffer, glue);
-	}
-	
-	public static void fNotice(String s) {
-		fs.println(s);
+	public static String encodeURL(URL url) {
+		return url.getHost() + "_" + url.getPath(); //XXX isn't this gonna give issues with urls that are the same but with other GET-params?
 	}
 }

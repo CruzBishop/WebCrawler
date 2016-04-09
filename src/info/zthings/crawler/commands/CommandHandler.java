@@ -1,52 +1,60 @@
 package info.zthings.crawler.commands;
 
-import info.zthings.crawler.classes.Command;
-import info.zthings.crawler.common.ConsoleUI;
+import info.zthings.crawler.classes.ICommand;
+import info.zthings.crawler.classes.statics.Logger;
+import info.zthings.crawler.commands.defaultcommands.CmdClear;
+import info.zthings.crawler.commands.defaultcommands.CmdCrawl;
+import info.zthings.crawler.commands.defaultcommands.CmdExec;
+import info.zthings.crawler.commands.defaultcommands.CmdHelp;
+import info.zthings.crawler.commands.defaultcommands.CmdSave;
+import info.zthings.crawler.commands.defaultcommands.CmdSetLocation;
+import info.zthings.crawler.commands.defaultcommands.CmdSetSaveDir;
+import info.zthings.crawler.commands.defaultcommands.CmdStatus;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 
 public class CommandHandler {
-	private static HashMap<String, Command> cmdList = new HashMap<String, Command>();
+	private static HashMap<String, ICommand> cmdList = new HashMap<String, ICommand>();
 	private static boolean inited = false;
 	
 	public static void init() {
 		if (inited) {
-			ConsoleUI.warn("CommandHandler is already inited!");
+			Logger.warn("CommandHandler is already inited!");
 			return;
 		}
 		
-		registerCommand(new DefaultCommands.Help());
-		registerCommand(new DefaultCommands.SetLocation());
-		registerCommand(new DefaultCommands.Crawl());
-		registerCommand(new DefaultCommands.Status());
-		registerCommand(new DefaultCommands.Exec());
-		registerCommand(new DefaultCommands.Clear());
-		registerCommand(new DefaultCommands.Output());
+		registerCommand(new CmdHelp());
+		registerCommand(new CmdSetLocation());
+		registerCommand(new CmdCrawl());
+		registerCommand(new CmdStatus());
+		registerCommand(new CmdExec());
+		registerCommand(new CmdClear());
+		registerCommand(new CmdSave());
+		registerCommand(new CmdSetSaveDir());
+		inited = true;
 	}
 	
-	public static void registerCommand(Command cmd) {
-		cmdList.put(cmd.getName(), cmd);
+	public static void registerCommand(ICommand cmd) {
+		cmdList.put(cmd.getClass().getSimpleName().toLowerCase().substring(3), cmd); //cutoff the Cmd prefix
 	}
 	
 	public static void parseCommand(String ... cmd) {
-		if (cmd[0].matches("exit") || cmd[0].matches("exit .*")) ConsoleUI.terminate();
-		
 		for (String n : cmdList.keySet()) {
-			if (cmd[0].toLowerCase().equals(n.toLowerCase())) {
+			if (cmd[0].equalsIgnoreCase(n)) {
 				cmdList.get(n).execute(cmd);
 				return;
 			}
 		}
-		ConsoleUI.out("Unreconized command: '" + cmd[0].toLowerCase() + "'");
+		Logger.out.println("Unreconized command: '" + cmd[0].toLowerCase() + "'");
 	}
 	
-	public static Command getCommand(String n) {
+	public static ICommand getCommand(String n) {
 		return cmdList.get(n);
 	}
 	
-	public static Set<Entry<String, Command>> getCommandList() {
+	public static Set<Entry<String, ICommand>> getCommandList() {
 		return cmdList.entrySet();
 	}
 }
