@@ -43,18 +43,22 @@ public class Logger {
 	public static Logger out;
 	public static Logger err;
 	private static Logger warns;
-	private static Logger errs;
+	private static Logger errors;
 	
 	public static void init() {
 		String logLoc = "logs/" + Util.formatDate("%d%-%m%-%y%") + "/" + Util.formatDate("%h%-%m%-%s%") + "/";
 		new File(logLoc).mkdirs();
 		
 		try {
+			System.setErr(new PrintStream(logLoc + "stdErr.log"));
+			//System.setOut(new PrintStream(logLoc + "stdOut.log"));
+
 			PrintStream outputStream = new PrintStream(logLoc + "output.log");
-			out = new Logger(new MultiPrintStream(System.out, new PrintStream(logLoc + "stdOut.log"), outputStream));
-			err = new Logger(new MultiPrintStream(System.err, new PrintStream(logLoc + "stdErr.log"), outputStream));
+			out = new Logger(new MultiPrintStream(System.out, outputStream));
+			err = new Logger(new MultiPrintStream(System.err, outputStream));
+			
 			warns = new Logger(new MultiPrintStream(System.err, new PrintStream(logLoc + "warnings.log"), outputStream));
-			errs = new Logger(new MultiPrintStream(System.err, new PrintStream(logLoc + "errors.log"), outputStream));
+			errors = new Logger(new MultiPrintStream(System.err, new PrintStream(logLoc + "errors.log"), outputStream));
 		} catch (Exception e) {
 			System.err.println("Couldn't setup loggers:");
 			e.printStackTrace();
@@ -66,6 +70,12 @@ public class Logger {
 		warns.println("WARNING: " + s);
 	}
 	public static void err(String s) {
-		errs.println("ERROR: " + s);
+		errors.println("ERROR: " + s);
+	}
+
+	public static void fatal(String msg, Exception ex) {
+		Logger.err.println(msg);
+		ex.printStackTrace();
+		System.exit(1);
 	}
 }

@@ -1,9 +1,12 @@
 package info.zthings.crawler.common;
 
-import info.zthings.crawler.classes.ICommand;
 import info.zthings.crawler.classes.ENCLOSIONS;
+import info.zthings.crawler.classes.interfaces.ICommand;
 import info.zthings.crawler.classes.statics.Logger;
 import info.zthings.crawler.commands.CommandHandler;
+
+/* Known issues:
+ */
 
 public class Bootstrap {
 	

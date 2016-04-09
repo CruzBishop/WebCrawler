@@ -1,7 +1,7 @@
 package info.zthings.crawler.commands.defaultcommands;
 
 import info.zthings.crawler.classes.Crawler;
-import info.zthings.crawler.classes.ICommand;
+import info.zthings.crawler.classes.interfaces.ICommand;
 import info.zthings.crawler.classes.statics.Logger;
 import info.zthings.crawler.classes.statics.Memory;
 import info.zthings.crawler.common.Ref;
