@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.util.Calendar;
 
 import org.jsoup.HttpStatusException;
@@ -52,6 +53,7 @@ public class Crawler {
 			f.createNewFile();
 			csv = new PrintStream(f);
 		} catch (IOException e) {
+			ConsoleUI.err("IOException while setting up streams");
 			e.printStackTrace();
 		}
 				
@@ -61,53 +63,13 @@ public class Crawler {
 		log.println("Requesting document object...");
 		
 		try {
-			Document d;
-			try {
-				d = Jsoup.connect(this.httploc).get();
-			} catch (UnsupportedMimeTypeException e) {
-				log.println("File type not supported (" + this.httploc + ")");
-				Memory.markLinkCrawled(this.httploc);
-				//Not needed cause the parent start() has linked it already
-				//Memory.addLink(this.source, this.httploc);
-				Memory.nextOnStack();
-				return;
-			} catch (HttpStatusException e) {
-				if (e.getStatusCode() == 404) {
-					ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
-					log.println("404: DOCUMENT DOESN'T EXIST");
-					Memory.markLinkCrawled(this.httploc);
-				} else if (e.getStatusCode() == 403) {
-					ConsoleUI.warn("Acces denied (403): " + this.httploc);
-					log.println("403: ACCES DENIED");
-					Memory.markLinkCrawled(this.httploc);
-				} else if (e.getStatusCode() == 503) { 
-					ConsoleUI.warn("Service unavaillable (503): " + this.httploc);
-					log.println("503: SERVICE UNAVAILABLE");
-					Memory.markLinkCrawled(this.httploc);
-				} else {
-					ConsoleUI.warn("Other HttpStatus error (" + e.getStatusCode() + "): " + this.httploc);
-					log.println("HTTPSTATUS ERROR: " + e.getStatusCode());
-					Memory.markLinkCrawled(this.httploc);
-				}
-				Memory.nextOnStack();
-				return;
-			} catch (IOException e) {
-				log.println("Other IO exception occured");
-				e.printStackTrace();
-				return;
-			} catch (Exception e) {
-				log.println("Other exception occured");
-				e.printStackTrace();
-				return;
-			}
-			
+			Document d = Jsoup.connect(this.httploc).get();
 			this.linkBuffer.add(this.httploc, d.select("a[href]"));
 			this.linkBuffer.log(log);
 			this.linkBuffer.csv(csv);
-			Memory.markLinkCrawled(this.httploc);
 			Memory.registerLinks(this.linkBuffer);
 
-			//Add crawlers to the waiting stack
+			//Add new crawlers to the waiting stack
 			for (String s : this.linkBuffer.getLinkList()) {
 				if (!Memory.isCrawled(s)) {
 					ConsoleUI.out("Adding crawler for " + s + " to the waiting stack, as it isn't in memory");
@@ -117,18 +79,50 @@ public class Crawler {
 					ConsoleUI.out("Not crawling " + s + " as it is already done in this session (branchindex: " + Memory.getBranchIndex(s) + ")");
 				}
 			}
-			Memory.nextOnStack();
+		} catch (UnsupportedMimeTypeException e) {
+			log.println("File type not supported (" + this.httploc + ")");
+			return;
 		} catch (IllegalArgumentException e) { 
 			if (e.getCause() instanceof MalformedURLException) {
-				ConsoleUI.err("Invalid URL in memory (" + Memory.getCrawlLocation() + ")");
-				log.println("URL is invalid for Java: " + this.httploc);
+				ConsoleUI.err("Invalid URL (" + this.httploc + ")");
+				log.println("URL is invalid: " + this.httploc);
 			}
-			e.printStackTrace(log);
+		} catch (MalformedURLException e) {
+			if (this.httploc.matches("mailto:.*")) {
+				//STUB
+			} else if (this.httploc.matches("callto:.*")) {
+				//STUB
+			} else {
+				log.println("Unsupported protocol: " + this.httploc);
+				ConsoleUI.err("Detected unknown protocol: " + this.httploc);
+				System.err.println("Unkown protocol: " + this.httploc);
+				e.printStackTrace();
+			}
+		} catch (HttpStatusException e) {
+			if (e.getStatusCode() == 404) {
+				ConsoleUI.warn("Link (" + this.httploc + ") is broken!");
+				log.println("404: DOCUMENT DOESN'T EXIST");
+			} else if (e.getStatusCode() == 403) {
+				ConsoleUI.warn("Acces denied (403): " + this.httploc);
+				log.println("403: ACCES DENIED");
+			} else if (e.getStatusCode() == 503) { 
+				ConsoleUI.warn("Service unavaillable (503): " + this.httploc);
+				log.println("503: SERVICE UNAVAILABLE");
+			} else {
+				ConsoleUI.warn("Other HttpStatus error (" + e.getStatusCode() + "): " + this.httploc);
+				log.println("HTTPSTATUS ERROR: " + e.getStatusCode());
+			}
+		} catch (SocketTimeoutException e) {
+			log.println("Connection timed out");
+			ConsoleUI.out("Connection timed out: " + this.httploc);
 		} catch (Exception e) {
 			log.println("Other exception occured");
+			System.err.println("OTHER EXCEPTION WHILE CRAWLING " + this.httploc);
 			e.printStackTrace();
 		} finally {
 			cleanup();
+			Memory.markLinkCrawled(this.httploc); //no doubles
+			Memory.nextOnStack(); //always go to the next one
 		}
 	}
 
