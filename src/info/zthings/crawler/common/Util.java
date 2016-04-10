@@ -15,10 +15,10 @@ public class Util {
 	public static String formatDate(String str) {
 		Calendar c = Calendar.getInstance();
 		str = str.replaceAll("%d%", String.valueOf(c.get(Calendar.DAY_OF_MONTH)));
-		str = str.replaceAll("%m%", String.valueOf(c.get(Calendar.MONTH+1))); //cause january = 0
+		str = str.replaceAll("%mo%", String.valueOf(c.get(Calendar.MONTH+1))); //cause january = 0
 		str = str.replaceAll("%y%", String.valueOf(c.get(Calendar.YEAR)));
 		str = str.replaceAll("%h%", String.valueOf(c.get(Calendar.HOUR_OF_DAY)));
-		str = str.replaceAll("%m%", String.valueOf(c.get(Calendar.MINUTE)));
+		str = str.replaceAll("%mi%", String.valueOf(c.get(Calendar.MINUTE)));
 		str = str.replaceAll("%s%", String.valueOf(c.get(Calendar.SECOND)));
 		return str;
 	}

@@ -11,7 +11,7 @@ public class CmdSetSaveDir implements ICommand {
 	public String getHelpText() {
 		return "Sets the location where the data for the next crawl will be saved to the first param"
 				+ "\nDefault value is /Day/Month/Year/Hour/Minute/Second/StartingLocation"
-				+ "\nUse %x% to insert a date format (d for day, m for month, y for year, h for hour, m for minutes & s for seconds)";
+				+ "\nUse %x% to insert a date format (d for day, mo for month, y for year, h for hour, mi for minutes & s for seconds)";
 	}
 	
 	@Override

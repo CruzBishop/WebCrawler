@@ -38,7 +38,7 @@ public class Memory {
 		savDir = loc;
 	}
 	public static void setSaveLocation() {
-		savDir = "crawls/" + Util.formatDate("%d%-%m%-%y%/%h%-%m%-%s%/" + getStartingLocation() + "/");
+		savDir = "crawls/" + Util.formatDate("%d%-%mo%-%y%/%h%-%mi%-%s%/" + getStartingLocation() + "/");
 	}
 	public static String getSaveLocation() {
 		return savDir;

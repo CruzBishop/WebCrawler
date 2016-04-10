@@ -46,7 +46,7 @@ public class Logger {
 	private static Logger errors;
 	
 	public static void init() {
-		String logLoc = "logs/" + Util.formatDate("%d%-%m%-%y%") + "/" + Util.formatDate("%h%-%m%-%s%") + "/";
+		String logLoc = "logs/" + Util.formatDate("%do%-%m%-%y%") + "/" + Util.formatDate("%h%-%mi%-%s%") + "/";
 		new File(logLoc).mkdirs();
 		
 		try {
