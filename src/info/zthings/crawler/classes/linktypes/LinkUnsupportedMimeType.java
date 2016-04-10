@@ -7,8 +7,8 @@ import org.jsoup.UnsupportedMimeTypeException;
 public class LinkUnsupportedMimeType extends BasicSpecialLink {
 	private String type;
 
-	public LinkUnsupportedMimeType(URL source, UnsupportedMimeTypeException ex) {
-		super(source);
+	public LinkUnsupportedMimeType(URL source, URL file, UnsupportedMimeTypeException ex) {
+		super(source, file);
 		this.type = ex.getMimeType();
 	}
 	
@@ -16,4 +16,9 @@ public class LinkUnsupportedMimeType extends BasicSpecialLink {
 	public String getMsg() {
 		return "Mime-type:" + this.type;
 	}
+	
+	/*@Override
+	public String getDetails() {
+		return target;
+	}*/
 }

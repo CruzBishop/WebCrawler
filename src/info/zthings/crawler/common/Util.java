@@ -1,9 +1,8 @@
 package info.zthings.crawler.common;
 
 import info.zthings.crawler.classes.ENCLOSIONS;
-import info.zthings.crawler.classes.IImplodable;
+import info.zthings.crawler.classes.interfaces.IImplodable;
 
-import java.net.URL;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.Map;
@@ -74,9 +73,5 @@ public class Util {
 		sb.substring(0, sb.length()-glue.length()); //remove last bit of glue
 		sb.append(ENCLOSIONS.getClosing(encloser));
 		return sb.toString();
-	}
-
-	public static String encodeURL(URL url) {
-		return url.getHost() + "_" + url.getPath(); //XXX isn't this gonna give issues with urls that are the same but with other GET-params?
 	}
 }

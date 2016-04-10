@@ -1,4 +1,4 @@
-package info.zthings.crawler.classes;
+package info.zthings.crawler.classes.interfaces;
 
 public interface ICommand {
 	public abstract String getHelpText();

@@ -1,6 +1,7 @@
 package info.zthings.crawler.commands.defaultcommands;
 
-import info.zthings.crawler.classes.ICommand;
+import info.zthings.crawler.classes.interfaces.ICommand;
+import info.zthings.crawler.classes.statics.Logger;
 import info.zthings.crawler.classes.statics.Memory;
 import info.zthings.crawler.commands.CommandParameterException;
 
@@ -18,7 +19,7 @@ public class CmdSetLocation implements ICommand {
 		try {
 			Memory.setStartingLocation(new URL(params[1]));
 		} catch (MalformedURLException e) {
-			//FIXME handle exception
+			Logger.out.println("Invalid starter location: " + params[1]);
 		}
 	}
 }
