@@ -1,0 +1,24 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# general
+ignored/
+*.bat
+*.log
+
+# repo specific
+*.cr
+*.cbl
+*.dat

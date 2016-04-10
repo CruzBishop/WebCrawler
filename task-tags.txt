@@ -1,0 +1,6 @@
+In addition to Eclipse's default tags (TODO, XXX, FIXME) the following task tags are used:
+NOTE - low priority notes that could be usefull for later bugfixes
+FUTURE - low priority tasks that must be done in the future
+NOW - high priority tasks that indicate where I have to work on next
+STUB - normal priority tasks that indicate this method/class isn't "build" yet
+CHECK - used to flag things that need to be checked before a release
